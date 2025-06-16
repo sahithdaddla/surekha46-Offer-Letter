@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #2980b9;
+            border-radius: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: #f0f3f5;
+            text-align: center;
+        }
+
+        .controls-section {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 1rem 0;
+        }
+
+        .container {
+           width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-bar {
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            width: 400px;
+            font-size: 0.9rem;
+        }
+
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .employee-table th,
+        .employee-table td {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .employee-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .employee-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .employee-table tr:hover {
+            background-color: #f1f9ff;
+        }
+
+        .employee-checkbox {
+            text-align: center;
+        }
+
+        .document-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .document-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #clearButton, #deleteSelectedButton {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        #clearButton {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        #clearButton:hover {
+            background-color: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        #deleteSelectedButton {
+            background-color: #e67e22;
+            color: white;
+        }
+
+        #deleteSelectedButton:hover {
+            background-color: #d35400;
+            transform: translateY(-1px);
+        }
+
+        .document-title {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 5px;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .view-btn {
+            background: #2ecc71;
+        }
+
+        .view-btn:hover {
+            background: #27ae60;
+        }
+
+        .download-btn {
+            background: #9b59b6;
+        }
+
+        .download-btn:hover {
+            background: #8e44ad;
+        }
+
+        .approve-btn {
+            background: #2ecc71;
+        }
+
+        .approve-btn:hover {
+            background: #27ae60;
+        }
+
+        .reject-btn {
+            background: #e74c3c;
+        }
+
+        .reject-btn:hover {
+            background: #c0392b;
+        }
+
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .pending {
+            background: #f1c40f;
+            color: #333;
+        }
+
+        .approved {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .rejected {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            float: right;
+            background: none;
+            color: #333;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .offer-letter-section, .document-upload-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .file-input {
+            margin: 1rem 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .employee-info p {
+            margin: 0.5rem 0;
+            color: #34495e;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 0.8rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .controls-section {
+                margin-top: 50px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-bar {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .employee-table {
+                font-size: 0.8rem;
+            }
+
+            .employee-table th,
+            .employee-table td {
+                padding: 0.5rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+            }
+
+            button, #clearButton, #deleteSelectedButton {
+                width: 100%;
+                padding: 0.8rem;
+            }
+
+            .document-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .button-group {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .button-group button {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .search-bar {
+                font-size: 0.8rem;
+            }
+
+            .employee-table {
+                font-size: 0.7rem;
+            }
+
+            .section-title {
+                font-size: 1rem;
+            }
+
+            .employee-info p {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>HR Portal</h1>
+    </header>
+
+    <div class="container">
+        <div class="controls-section">
+            <input type="text" id="searchEmployees" class="search-bar" placeholder="Search employees...">
+            <div class="button-group">
+                <button id="deleteSelectedButton">Delete Selected</button>
+                <button id="clearButton">Clear All Data</button>
+            </div>
+        </div>
+        <table class="employee-table" id="employeeList">
+            <thead>
+                <tr>
+                    <th style="width: 5%;"><input type="checkbox" id="selectAll"></th>
+                    <th style="width: 15%;">Referral ID</th>
+                    <th style="width: 20%;">Name</th>
+                    <th style="width: 20%;">Email</th>
+                    <th style="width: 15%;">Phone</th>
+                    <th style="width: 10%;">Location</th>
+                    <th style="width: 10%;">Role</th>
+                    <th style="width: 10%;">Status</th>
+                    <th style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="documentModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn">×</button>
+            <h2 class="section-title">Employee Details</h2>
+            <div id="documentContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Utility function to escape special characters for HTML
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return unsafe || '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Format date helper function
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return 'Invalid Date';
+            }
+        }
+
+        // Document display function
+        function getDocumentDisplay(documentData) {
+            if (!documentData || !documentData.data || !documentData.type || !documentData.data.startsWith('data:')) {
+                console.error('Invalid document data:', documentData);
+                return '<p style="color: #e74c3c;">Document not available. Please upload the document.</p>';
+            }
+
+            try {
+                const base64Pattern = /^data:[a-zA-Z0-9\/+]+;base64,[a-zA-Z0-9\/+=]+$/;
+                if (!base64Pattern.test(documentData.data)) {
+                    console.error('Invalid base64 format:', documentData.data);
+                    return '<p style="color: #e74c3c;">Invalid document data. Please re-upload the document.</p>';
+                }
+
+                if (documentData.type.startsWith('image/')) {
+                    return `<img src="${documentData.data}" style="max-width: 100%; max-height: 70vh; object-fit: contain;" onerror="this.outerHTML='<p style=&quot;color: #e74c3c;&quot;>Error loading image. Please re-upload the document.</p>'">`;
+                } else if (documentData.type === 'application/pdf') {
+                    return `<iframe src="${documentData.data}" style="width: 100%; height: 70vh; border: none;" onerror="this.outerHTML='<p style=&quot;color: #e74c3c;&quot;>Error loading PDF. Please re-upload the document.</p>'"></iframe>`;
+                } else {
+                    return `<div class="document-preview" style="padding: 20px; background: #f5f5f5; border-radius: 8px;">
+                        <p>Preview not available for this file type</p>
+                        <p>File Type: ${escapeHtml(documentData.type)}</p>
+                        <p>Click download to access the file</p>
+                    </div>`;
+                }
+            } catch (error) {
+                console.error('Error displaying document:', error);
+                return '<p style="color: #e74c3c;">Error loading document. Please re-upload the document.</p>';
+            }
+        }
+
+        // View document
+        function viewDocument(id, docKey, docTitle, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            fetch(`http://localhost:3000/api/employee/${id}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(employee => {
+                    let documentData;
+                    if (docKey === 'ssc' || docKey === 'hsc' || docKey === 'ug') {
+                        documentData = employee.documents?.[docKey];
+                    } else if (docKey === 'relievingLetter') {
+                        documentData = employee.previousEmployment?.relievingLetter;
+                    } else if (docKey === 'offerLetter') {
+                        documentData = employee.offerLetter;
+                    }
+
+                    const modal = document.getElementById('documentModal');
+                    const content = document.getElementById('documentContent');
+
+                    if (!documentData || !documentData.data || !documentData.type) {
+                        console.error(`Document (${docKey}) not found or invalid for id ${id}`);
+                        content.innerHTML = `
+                            <div style="padding: 1rem; text-align: center;">
+                                <h3>${escapeHtml(docTitle)}</h3>
+                                <p style="color: #e74c3c;">Document not available. Please upload the document or check the employee data.</p>
+                            </div>
+                        `;
+                        modal.classList.add('active');
+                        return;
+                    }
+
+                    content.innerHTML = `
+                        <div style="padding: 1rem; text-align: center;">
+                            <h3>${escapeHtml(docTitle)}</h3>
+                            <p style="margin: 1rem 0;">Filename: ${escapeHtml(documentData.name || 'Unknown')}</p>
+                            ${getDocumentDisplay(documentData)}
+                            
+                        </div>
+                    `;
+                    modal.classList.add('active');
+                })
+                .catch(error => {
+                    console.error('Error fetching document:', error);
+                    const content = document.getElementById('documentContent');
+                    content.innerHTML = `
+                        <div style="padding: 1rem; text-align: center;">
+                            <h3>${escapeHtml(docTitle)}</h3>
+                            <p style="color: #e74c3c;">Error loading document. Please try again.</p>
+                        </div>
+                    `;
+                    document.getElementById('documentModal').classList.add('active');
+                });
+        }
+
+        // Download document
+        function downloadDocument(id, docKey, docTitle) {
+            fetch(`http://localhost:3000/api/employee/${id}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(employee => {
+                    let documentData;
+                    if (docKey === 'ssc' || docKey === 'hsc' || docKey === 'ug') {
+                        documentData = employee.documents?.[docKey];
+                    } else if (docKey === 'relievingLetter') {
+                        documentData = employee.previousEmployment?.relievingLetter;
+                    } else if (docKey === 'offerLetter') {
+                        documentData = employee.offerLetter;
+                    }
+
+                    if (!documentData || !documentData.data || !documentData.type) {
+                        console.error(`Document (${docKey}) not found or invalid for id ${id}`);
+                        alert('Document not available for download. Please upload the document or check the employee data.');
+                        return;
+                    }
+
+                    try {
+                        if (!documentData.data.startsWith('data:')) {
+                            console.error('Invalid base64 data for document:', documentData);
+                            alert('Invalid document data. Please re-upload the document.');
+                            return;
+                        }
+
+                        let fileName = documentData.name || `document_${docKey}`;
+                        if (!fileName.includes('.')) {
+                            const extension = documentData.type === 'application/pdf' ? '.pdf' :
+                                            documentData.type.startsWith('image/') ? `.${documentData.type.split('/')[1]}` : '';
+                            fileName += extension;
+                        }
+
+                        const link = document.createElement('a');
+                        link.href = documentData.data;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } catch (error) {
+                        console.error('Download error:', error);
+                        alert('Error downloading document. Please try again or re-upload the document.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching document:', error);
+                    alert('Error downloading document. Please try again.');
+                });
+        }
+
+        // Load employees
+        async function loadEmployees(searchTerm = '') {
+            try {
+                console.log('Fetching employees with search term:', searchTerm);
+                const response = await fetch(`http://localhost:3000/api/employees${searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ''}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const employees = await response.json();
+                console.log('Fetched employees:', employees);
+                const employeeList = document.querySelector('#employeeList tbody');
+                employeeList.innerHTML = '';
+
+                if (employees.length === 0) {
+                    employeeList.innerHTML = `
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 2rem;">
+                                <h3>No employees found</h3>
+                                <p>New employee submissions will appear here</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                employees.forEach(employee => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="employee-checkbox"><input type="checkbox" data-id="${employee.id}"></td>
+                        <td>${escapeHtml(employee.referralId || 'N/A')}</td>
+                        <td>${escapeHtml(employee.name || 'N/A')}</td>
+                        <td>${escapeHtml(employee.email || 'N/A')}</td>
+                        <td>${escapeHtml(employee.phone || 'N/A')}</td>
+                        <td>${escapeHtml(employee.location || 'N/A')}</td>
+                        <td>${escapeHtml(employee.role || 'N/A')}</td>
+                        <td><span class="status ${employee.status || 'pending'}">${escapeHtml((employee.status || 'pending').toUpperCase())}</span></td>
+                        <td class="button-group">
+                            <button class="view-btn" onclick="viewEmployeeDetails(${employee.id})">View Details</button>
+                        </td>
+                    `;
+                    employeeList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading employees:', error);
+                alert('Error loading employee data. Please try again.');
+            }
+        }
+
+        // View employee details
+        async function viewEmployeeDetails(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/employee/${id}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const employee = await response.json();
+                console.log('Employee details:', employee);
+
+                const documents = [
+                    { title: 'SSC Certificate', key: 'ssc', data: employee.documents?.ssc },
+                    { title: 'HSC Certificate', key: 'hsc', data: employee.documents?.hsc },
+                    { title: 'UG Certificate', key: 'ug', data: employee.documents?.ug },
+                    { title: 'Relieving Letter', key: 'relievingLetter', data: employee.previousEmployment?.relievingLetter },
+                    { title: 'Offer Letter', key: 'offerLetter', data: employee.offerLetter }
+                ].filter(doc => doc.data);
+
+                const documentItems = documents.map(doc => `
+                    <div class="document-item">
+                        <span class="document-title">${escapeHtml(doc.title)}</span>
+                        <div class="button-group">
+                            <button class="view-btn" onclick="viewDocument(${employee.id}, '${doc.key}', '${escapeHtml(doc.title)}', event)">View</button>
+                            <button class="download-btn" onclick="downloadDocument(${employee.id}, '${doc.key}', '${escapeHtml(doc.title)}')">Download</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                const documentUploadItems = [
+                    ...(employee.previousEmployment && !employee.previousEmployment.relievingLetter ? [{ title: 'Relieving Letter', key: 'relievingLetter' }] : []),
+                    ...(employee.status !== 'approved' ? [
+                        { title: 'SSC Certificate', key: 'ssc' },
+                        { title: 'HSC Certificate', key: 'hsc' },
+                        { title: 'UG Certificate', key: 'ug' }
+                    ] : []),
+                    ...(employee.status === 'approved' && !employee.offerLetter ? [{ title: 'Offer Letter', key: 'offerLetter' }] : [])
+                ].filter(doc => !documents.some(d => d.key === doc.key)).map(doc => `
+                    <div class="file-input">
+                        <input type="file" id="fileInput_${doc.key}_${employee.id}" accept=".pdf,.jpg,.png">
+                        <button onclick="uploadDocument(${employee.id}, '${doc.key}', '${escapeHtml(doc.title)}')">Upload ${escapeHtml(doc.title)}</button>
+                    </div>
+                `).join('');
+
+                const prevEmployment = employee.previousEmployment ? `
+                    <div class="document-section">
+                        <h3 class="section-title">Previous Employment</h3>
+                        <p><strong>Company:</strong> ${escapeHtml(employee.previousEmployment.company || 'N/A')}</p>
+                        <p><strong>Role:</strong> ${escapeHtml(employee.previousEmployment.role || 'N/A')}</p>
+                        <p><strong>Experience:</strong> ${escapeHtml(employee.previousEmployment.experience || 'N/A')} years</p>
+                    </div>
+                ` : '<p>No previous employment details</p>';
+
+                const actionButtons = employee.status === 'pending' ? `
+                    <div class="button-group" style="margin-top: 1rem;">
+                        <button class="approve-btn" onclick="approveEmployee(${employee.id})">Approve</button>
+                        <button class="reject-btn" onclick="rejectEmployee(${employee.id})">Reject</button>
+                    </div>
+                ` : '';
+
+                const modal = document.getElementById('documentModal');
+                const content = document.getElementById('documentContent');
+                content.innerHTML = `
+                    <h2>${escapeHtml(employee.name || 'Unknown')}</h2>
+                    <div class="employee-info">
+                        <p><strong>Referral ID:</strong> ${escapeHtml(employee.referralId || 'N/A')}</p>
+                        <p><strong>Email:</strong> ${escapeHtml(employee.email || 'N/A')}</p>
+                        <p><strong>Phone:</strong> ${escapeHtml(employee.phone || 'N/A')}</p>
+                        <p><strong>Guardian Name:</strong> ${escapeHtml(employee.guardianName || 'N/A')}</p>
+                        <p><strong>Guardian Phone:</strong> ${escapeHtml(employee.guardianPhone || 'N/A')}</p>
+                        <p><strong>Address:</strong> ${escapeHtml(employee.address || 'N/A')}</p>
+                        <p><strong>Location:</strong> ${escapeHtml(employee.location || 'N/A')}</p>
+                        <p><strong>Role:</strong> ${escapeHtml(employee.role || 'N/A')}</p>
+                        <p><strong>Position:</strong> ${escapeHtml(employee.position || 'N/A')}</p>
+                        <p><strong>Submission Date:</strong> ${escapeHtml(formatDate(employee.submissionDate))}</p>
+                        ${employee.approvalDate ? `<p><strong>Approval Date:</strong> ${escapeHtml(formatDate(employee.approvalDate))}</p>` : ''}
+                        ${employee.rejectionDate ? `<p><strong>Rejection Date:</strong> ${escapeHtml(formatDate(employee.rejectionDate))}</p>` : ''}
+                        ${employee.rejectionReason ? `<p><strong>Rejection Reason:</strong> ${escapeHtml(employee.rejectionReason)}</p>` : ''}
+                        ${prevEmployment}
+                    </div>
+                    <div class="document-section">
+                        <h3 class="section-title">Documents</h3>
+                        ${documentItems || '<p>No documents available</p>'}
+                    </div>
+                    ${documentUploadItems ? `
+                        <div class="document-upload-section">
+                            <h3 class="section-title">Upload Documents</h3>
+                            ${documentUploadItems}
+                        </div>
+                    ` : ''}
+                    ${actionButtons}
+                `;
+                modal.classList.add('active');
+            } catch (error) {
+                console.error('Error viewing employee details:', error);
+                alert('Error loading employee details. Please try again.');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('documentModal').classList.remove('active');
+            document.getElementById('documentContent').innerHTML = '';
+        }
+
+        // Approve employee
+        async function approveEmployee(id) {
+            if (confirm('Are you sure you want to approve this employee?')) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/employee/${id}/approve`, {
+                        method: 'PUT'
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Employee approved successfully');
+                        loadEmployees();
+                        viewEmployeeDetails(id);
+                    } else {
+                        alert(`Error: ${result.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error approving employee:', error);
+                    alert('Error approving employee. Please try again.');
+                }
+            }
+        }
+
+        // Reject employee
+        async function rejectEmployee(id) {
+            const reason = prompt('Please provide a reason for rejection:');
+            if (reason) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/employee/${id}/reject`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reason })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Employee rejected successfully');
+                        loadEmployees();
+                        viewEmployeeDetails(id);
+                    } else {
+                        alert(`Error: ${result.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error rejecting employee:', error);
+                    alert('Error rejecting employee. Please try again.');
+                }
+            }
+        }
+
+        // Delete selected employees
+        async function deleteSelectedEmployees() {
+            const checkboxes = document.querySelectorAll('#employeeList tbody .employee-checkbox input:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select at least one employee to delete');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete the selected employees?')) {
+                try {
+                    const ids = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+                    const response = await fetch('http://localhost:3000/api/employees', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids })
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Selected employees deleted successfully');
+                        loadEmployees();
+                    } else {
+                        alert(`Error: ${result.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error deleting employees:', error);
+                    alert('Error deleting employees. Please try again.');
+                }
+            }
+        }
+
+        // Clear all data
+        async function clearAllData() {
+            if (confirm('Are you sure you want to clear all employee data? This action cannot be undone.')) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/employees/clear', {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('All employee data has been cleared successfully!');
+                        loadEmployees();
+                    } else {
+                        alert(`Error: ${result.error}`);
+                    }
+                } catch (error) {
+                    console.error('Error clearing data:', error);
+                    alert('Error clearing data. Please try again.');
+                }
+            }
+        }
+
+        // Upload document
+        async function uploadDocument(id, docKey, docTitle) {
+            const input = document.getElementById(`fileInput_${docKey}_${id}`);
+            if (!input || !input.files.length) {
+                alert('Please select a file to upload');
+                return;
+            }
+
+            try {
+                const file = input.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size should not exceed 5MB');
+                    return;
+                }
+
+                const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Only PDF, JPEG, and PNG files are allowed');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('docType', docKey);
+
+                const endpoint = docKey === 'offerLetter' ? 
+                    `http://localhost:3000/api/employee/${id}/offer-letter` : 
+                    `http://localhost:3000/api/employee/${id}/upload`;
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    alert(`${docTitle} uploaded successfully`);
+                    viewEmployeeDetails(id);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error(`Error uploading ${docTitle}:`, error);
+                alert(`Error uploading ${docTitle}. Please try again.`);
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                loadEmployees();
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                alert('Error loading HR Portal. Please refresh the page.');
+            }
+
+            let searchTimeout;
+            document.getElementById('searchEmployees').addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    loadEmployees(e.target.value);
+                }, 300);
+            });
+
+            document.getElementById('clearButton').addEventListener('click', clearAllData);
+
+            document.getElementById('deleteSelectedButton').addEventListener('click', deleteSelectedEmployees);
+
+            document.getElementById('selectAll').addEventListener('change', (e) => {
+                document.querySelectorAll('#employeeList tbody .employee-checkbox input').forEach(cb => {
+                    cb.checked = e.target.checked;
+                });
+            });
+
+            document.querySelector('.close-btn').addEventListener('click', closeModal);
+
+            window.addEventListener('click', (e) => {
+                const modal = document.getElementById('documentModal');
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
