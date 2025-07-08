@@ -15,9 +15,9 @@ app.use(fileUpload());
 // PostgreSQL connection
 const pool = new Pool({
     user: 'postgres',
-    host: 'localhost',
+    host: 'postgres',
     database: 'employee_portals',
-    password: 'root',
+    password: 'admin123',
     port: 5432,
 });
 
@@ -518,7 +518,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3095;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

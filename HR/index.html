@@ -470,7 +470,7 @@
                 event.stopPropagation();
             }
 
-            fetch(`http://localhost:3000/api/employee/${id}`)
+            fetch(`http://16.170.249.150:3095/api/employee/${id}`)
                 .then(response => {
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     return response.json();
@@ -525,7 +525,7 @@
 
         // Download document
         function downloadDocument(id, docKey, docTitle) {
-            fetch(`http://localhost:3000/api/employee/${id}`)
+            fetch(`http://16.170.249.150:3095/api/employee/${id}`)
                 .then(response => {
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     return response.json();
@@ -581,7 +581,7 @@
         async function loadEmployees(searchTerm = '') {
             try {
                 console.log('Fetching employees with search term:', searchTerm);
-                const response = await fetch(`http://localhost:3000/api/employees${searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ''}`);
+                const response = await fetch(`http://16.170.249.150:3095/api/employees${searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : ''}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -628,7 +628,7 @@
         // View employee details
         async function viewEmployeeDetails(id) {
             try {
-                const response = await fetch(`http://localhost:3000/api/employee/${id}`);
+                const response = await fetch(`http://16.170.249.150:3095/api/employee/${id}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -733,7 +733,7 @@
         async function approveEmployee(id) {
             if (confirm('Are you sure you want to approve this employee?')) {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/employee/${id}/approve`, {
+                    const response = await fetch(`http://16.170.249.150:3095/api/employee/${id}/approve`, {
                         method: 'PUT'
                     });
                     const result = await response.json();
@@ -756,7 +756,7 @@
             const reason = prompt('Please provide a reason for rejection:');
             if (reason) {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/employee/${id}/reject`, {
+                    const response = await fetch(`http://16.170.249.150:3095/api/employee/${id}/reject`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ reason })
@@ -787,7 +787,7 @@
             if (confirm('Are you sure you want to delete the selected employees?')) {
                 try {
                     const ids = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
-                    const response = await fetch('http://localhost:3000/api/employees', {
+                    const response = await fetch('http://16.170.249.150:3095/api/employees', {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ ids })
@@ -810,7 +810,7 @@
         async function clearAllData() {
             if (confirm('Are you sure you want to clear all employee data? This action cannot be undone.')) {
                 try {
-                    const response = await fetch('http://localhost:3000/api/employees/clear', {
+                    const response = await fetch('http://16.170.249.150:3095/api/employees/clear', {
                         method: 'DELETE'
                     });
                     const result = await response.json();
@@ -853,8 +853,8 @@
                 formData.append('docType', docKey);
 
                 const endpoint = docKey === 'offerLetter' ? 
-                    `http://localhost:3000/api/employee/${id}/offer-letter` : 
-                    `http://localhost:3000/api/employee/${id}/upload`;
+                    `http://16.170.249.150:3095/api/employee/${id}/offer-letter` : 
+                    `http://16.170.249.150:3095/api/employee/${id}/upload`;
 
                 const response = await fetch(endpoint, {
                     method: 'POST',
