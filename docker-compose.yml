@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: employee_portals
     ports:
-      - "5522:5432"
+      - "5607:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -18,9 +18,9 @@ services:
     build: ./Backend
     container_name: offerletter-backend
     ports:
-      - "3095:3095"
+      - "3607:3607"
     environment:
-      PORT: 3095
+      PORT: 3607
       DB_USER: postgres
       DB_PASSWORD: admin123
       DB_NAME: employee_portals
@@ -33,7 +33,7 @@ services:
     build: ./Congratulations
     container_name: offerletter-congratulations
     ports:
-      - "8325:80"
+      - "8613:80"
     depends_on:
       - backend
 
@@ -41,7 +41,7 @@ services:
     build: ./HR
     container_name: offerletter-hr
     ports:
-      - "8326:80"
+      - "8614:80"
     depends_on:
       - backend
 
@@ -49,7 +49,7 @@ services:
     build: ./employee
     container_name: offerletter-employee
     ports:
-      - "8327:80"
+      - "8615:80"
     depends_on:
       - backend
 
